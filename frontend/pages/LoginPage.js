@@ -4,7 +4,7 @@ export default {
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title text-center">Login</h3>
+                    <h3 class="card-title text-center mb-4">Login</h3>
                     <div class="mb-3">
                         <input type="email" class="form-control" placeholder="Email" v-model="email">
                     </div>
@@ -41,7 +41,8 @@ export default {
                     this.$store.commit('setUser');
                     this.$router.push('/');
                 } else {
-                    alert('Login failed');
+                    const error = await res.json();
+                    alert(error.message || 'Login failed');
                 }
             } catch (error) {
                 console.error('Login error:', error);

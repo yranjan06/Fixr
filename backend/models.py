@@ -15,6 +15,17 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean, default=True)
     fs_uniquifier = db.Column(db.String, unique=True, nullable=False)
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
+    
+    # Additional fields for user types
+    user_type = db.Column(db.String, nullable=False)  # 'customer' or 'professional'
+    full_name = db.Column(db.String, nullable=True)
+    address = db.Column(db.String, nullable=True)
+    pin_code = db.Column(db.String, nullable=True)
+
+    # Professional-specific fields
+    service_type = db.Column(db.String, nullable=True)
+    experience_years = db.Column(db.Integer, nullable=True)
+    certifications = db.Column(db.String, nullable=True)  # File path
 
 class UserRoles(db.Model):
     id = db.Column(db.Integer, primary_key=True)

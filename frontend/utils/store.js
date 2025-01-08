@@ -3,6 +3,7 @@ const store = new Vuex.Store({
         auth_token: null,
         email: null,
         role: null,
+        user_type: null,
         loggedIn: false,
     },
     mutations: {
@@ -12,6 +13,7 @@ const store = new Vuex.Store({
                 state.auth_token = user.token;
                 state.email = user.email;
                 state.role = user.role;
+                state.user_type = user.user_type;
                 state.loggedIn = true;
             }
         },
@@ -19,8 +21,10 @@ const store = new Vuex.Store({
             state.auth_token = null;
             state.email = null;
             state.role = null;
+            state.user_type = null;
             state.loggedIn = false;
             localStorage.removeItem('user');
+            router.push('/');
         }
     }
 })

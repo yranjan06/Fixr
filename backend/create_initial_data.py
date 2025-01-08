@@ -4,13 +4,14 @@ from flask_security import hash_password
 
 with app.app_context():
     db.create_all()
-    
+
     datastore = app.security.datastore
-    
+
     # Create roles
     datastore.find_or_create_role(name='admin', description='Administrator')
-    datastore.find_or_create_role(name='user', description='Regular User')
-    
+    datastore.find_or_create_role(name='customer', description='Customer User')
+    datastore.find_or_create_role(name='professional', description='Service Provider')
+
     # Create a test admin user
     if not datastore.find_user(email='admin@test.com'):
         datastore.create_user(
@@ -18,5 +19,5 @@ with app.app_context():
             password=hash_password('admin123'),
             roles=['admin']
         )
-    
+
     db.session.commit()

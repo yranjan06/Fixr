@@ -1,11 +1,13 @@
 import HomePage from '../pages/HomePage.js'
 import LoginPage from '../pages/LoginPage.js'
-import RegisterPage from '../pages/RegisterPage.js'
+import CustomerRegisterPage from '../pages/CustomerRegisterPage.js'
+import ProfessionalRegisterPage from '../pages/ProfessionalRegisterPage.js'
 
 const routes = [
-    {path: '/', component: HomePage},
-    {path: '/login', component: LoginPage},
-    {path: '/register', component: RegisterPage},
+    { path: '/', component: HomePage },
+    { path: '/login', component: LoginPage },
+    { path: '/register/customer', component: CustomerRegisterPage },
+    { path: '/register/professional', component: ProfessionalRegisterPage },
 ]
 
 const router = new VueRouter({

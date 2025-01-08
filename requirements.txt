@@ -5,3 +5,6 @@ Flask-Security-Too==5.5.2
 Flask-SQLAlchemy==3.1.1
 email_validator==2.2.0
 bcrypt==4.1.2
+Werkzeug==2.3.0
+
+
