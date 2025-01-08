@@ -7,14 +7,20 @@ from backend.models import db, User, Role
 import os
 
 # File upload settings
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance/uploads')
+INSTANCE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
+UPLOAD_FOLDER = os.path.join(INSTANCE_PATH, 'uploads')
 ALLOWED_EXTENSIONS = {'pdf'}
 
 def create_app():
-    app = Flask(__name__, template_folder='frontend', static_folder='frontend', static_url_path='')
-    
-    # Ensure upload folder exists
+    # Create instance and uploads folders
+    os.makedirs(INSTANCE_PATH, exist_ok=True)
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
+    app = Flask(__name__, 
+                template_folder='frontend', 
+                static_folder='frontend', 
+                static_url_path='',
+                instance_path=INSTANCE_PATH)
     
     app.config.from_object(LocalDevelopmentConfig)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -30,11 +36,11 @@ def create_app():
     security = Security(app, datastore=datastore)
     
     with app.app_context():
-        import backend.create_initial_data
-        import backend.routes
-        
         # Create database tables
         db.create_all()
+        
+        import backend.create_initial_data
+        import backend.routes
     
     return app
 
