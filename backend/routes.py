@@ -56,3 +56,25 @@ def register():
     except:
         db.session.rollback()
         return jsonify({"message" : "error creating user"}), 400
+    
+
+
+    from flask import jsonify, request
+from flask_security import auth_required, verify_password, hash_password
+from backend.models import db
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"message": "Invalid inputs"}), 400
+
+    user = app.security.datastore.find_user(email=email)
+    if user and verify_password(password, user.password):
+        return jsonify({"token": user.get_auth_token(), "email": user.email, "role": user.role})
+
+    return jsonify({"message": "Invalid credentials"}), 401
