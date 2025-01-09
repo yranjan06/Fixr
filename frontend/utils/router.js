@@ -15,3 +15,23 @@ const router = new VueRouter({
 })
 
 export default router
+
+
+// navigation guards
+router.beforeEach((to, from, next) => {
+    if (to.matched.some((record) => record.meta.requiresLogin)){
+        if (!store.state.loggedIn){
+            next({path : '/login'})
+        } else if (to.meta.role && to.meta.role != store.state.role){
+            alert('role not authorized')
+             next({path : '/'})
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+})
+
+
+export default router;
