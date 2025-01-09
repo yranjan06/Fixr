@@ -18,6 +18,11 @@ class User(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
     confirmed_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login_at = db.Column(db.DateTime)
+    current_login_at = db.Column(db.DateTime)
+    last_login_ip = db.Column(db.String(100))
+    current_login_ip = db.Column(db.String(100))
+    login_count = db.Column(db.Integer, default=0)
     
     # User type and common fields
     user_type = db.Column(db.String(20), nullable=False)
@@ -31,7 +36,8 @@ class User(db.Model, UserMixin):
     certifications = db.Column(db.String(255))
     
     # Relationships
-    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary='user_roles', 
+                          backref=db.backref('users', lazy='dynamic'))
 
 class UserRoles(db.Model):
     id = db.Column(db.Integer, primary_key=True)
