@@ -7,14 +7,18 @@ from backend.models import db, User, Role
 import os
 
 # File upload settings
-INSTANCE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+INSTANCE_PATH = os.path.join(BASE_DIR, 'instance')
 UPLOAD_FOLDER = os.path.join(INSTANCE_PATH, 'uploads')
 ALLOWED_EXTENSIONS = {'pdf'}
 
 def create_app():
-    # Create instance and uploads folders
+    # Create instance and uploads folders with proper permissions
     os.makedirs(INSTANCE_PATH, exist_ok=True)
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
+    # Ensure proper permissions for SQLite database directory
+    os.chmod(INSTANCE_PATH, 0o755)
     
     app = Flask(__name__, 
                 template_folder='frontend', 
@@ -24,6 +28,7 @@ def create_app():
     
     app.config.from_object(LocalDevelopmentConfig)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(INSTANCE_PATH, 'database.sqlite3')}"
     
     # Enable CORS
     CORS(app)
@@ -39,8 +44,12 @@ def create_app():
         # Create database tables
         db.create_all()
         
-        import backend.create_initial_data
+        # Import routes after database initialization
         import backend.routes
+        
+        # Create initial data only if database is empty
+        if not User.query.first():
+            import backend.create_initial_data
     
     return app
 

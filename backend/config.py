@@ -11,8 +11,12 @@ class Config:
     SECURITY_TOKEN_MAX_AGE = timedelta(days=5)
     WTF_CSRF_ENABLED = True
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+    }
 
 class LocalDevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///instance/database.sqlite3"
+    # Database URI will be set in app.py
     WTF_CSRF_ENABLED = False  # Only for development
