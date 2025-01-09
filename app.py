@@ -10,6 +10,7 @@ from backend.errors import register_error_handlers
 import logging
 import os
 from logging.handlers import RotatingFileHandler
+from datetime import timedelta
 
 # File upload settings
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -22,7 +23,6 @@ def setup_logging(app):
     """Configure application logging"""
     os.makedirs(LOG_FOLDER, exist_ok=True)
     
-    # Set up rotating file handler
     file_handler = RotatingFileHandler(
         os.path.join(LOG_FOLDER, 'fixr.log'),
         maxBytes=1024 * 1024,  # 1MB
@@ -43,7 +43,7 @@ def create_app(config_class=None):
         # Create required directories with proper permissions
         for path in [INSTANCE_PATH, UPLOAD_FOLDER, LOG_FOLDER]:
             os.makedirs(path, exist_ok=True)
-            os.chmod(path, 0o755)
+            os.chmod(path, 0o750)  # More restrictive permissions
         
         app = Flask(__name__, 
                    template_folder='frontend', 
@@ -57,10 +57,15 @@ def create_app(config_class=None):
         
         app.config.from_object(config_class)
         app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-        app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+        app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max file size
         
         # Ensure required environment variables are set
-        required_env_vars = ['SECRET_KEY', 'SECURITY_PASSWORD_SALT']
+        required_env_vars = [
+            'SECRET_KEY', 
+            'SECURITY_PASSWORD_SALT',
+            'DATABASE_URL',
+            'REDIS_URL'
+        ]
         missing_vars = [var for var in required_env_vars if not os.getenv(var)]
         if missing_vars:
             raise RuntimeError(f"Missing required environment variables: {', '.join(missing_vars)}")
@@ -71,20 +76,24 @@ def create_app(config_class=None):
         # Setup CORS with more restrictive settings
         CORS(app, resources={
             r"/*": {
-                "origins": app.config.get('ALLOWED_ORIGINS', ['http://localhost:5000']),
+                "origins": app.config.get('ALLOWED_ORIGINS', []),
                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-                "allow_headers": ["Content-Type", "Authorization", "Authentication-Token"]
+                "allow_headers": ["Content-Type", "Authorization", "Authentication-Token"],
+                "expose_headers": ["Content-Type", "X-CSRFToken"],
+                "supports_credentials": True,
+                "max_age": 600
             }
         })
         
-        # Initialize rate limiter
+        # Initialize rate limiter with Redis
         limiter = Limiter(
             app=app,
             key_func=get_remote_address,
-            default_limits=["200 per day", "50 per hour"]
+            default_limits=["200 per day", "50 per hour"],
+            storage_uri=os.getenv('REDIS_URL')
         )
         
-        # Setup Flask-Security
+        # Setup Flask-Security with enhanced settings
         datastore = SQLAlchemyUserDatastore(db, User, Role)
         security = Security(app, datastore=datastore)
         
@@ -94,11 +103,22 @@ def create_app(config_class=None):
         # Setup logging
         setup_logging(app)
         
+        # Security headers middleware
+        @app.after_request
+        def add_security_headers(response):
+            response.headers.update({
+                'X-Content-Type-Options': 'nosniff',
+                'X-Frame-Options': 'DENY',
+                'X-XSS-Protection': '1; mode=block',
+                'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+                'Content-Security-Policy': "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' data:;",
+                'Referrer-Policy': 'strict-origin-when-cross-origin',
+                'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+            })
+            return response
+        
         with app.app_context():
-            # Create database tables
             db.create_all()
-            
-            # Import routes after database initialization
             import backend.routes
             
             # Create initial data only if database is empty
@@ -115,23 +135,7 @@ def create_app(config_class=None):
         print(f"Failed to create application: {str(e)}")
         raise
 
-def main():
-    """Main application entry point"""
-    app = create_app()
-    
-    # Security headers middleware
-    @app.after_request
-    def add_security_headers(response):
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        response.headers['X-XSS-Protection'] = '1; mode=block'
-        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-        response.headers['Content-Security-Policy'] = "default-src 'self'"
-        return response
-    
-    return app
-
-app = main()
+app = create_app()
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
