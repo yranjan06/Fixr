@@ -1,11 +1,11 @@
-import Login from "../pages/Login.js";
-import CustomerRegister from "../pages/CustomerRegister.js";
-import ProviderRegister from "../pages/ProviderRegister.js";
-import AdminDashboard from "../pages/AdminDashboard.js";
-import CustomerDashboard from "../pages/CustomerDashboard.js";
-import ProviderDashboard from "../pages/ProviderDashboard.js";
+import LoginPage from "../pages/LoginPage.js";
+import CustomerRegisterPage from "../pages/CustomerRegisterPage.js";
+import ProviderRegisterPage from "../pages/ProviderRegisterPage.js";
+import AdminDashboardPage from "../pages/AdminDashboardPage.js";
+import CustomerDashboardPage from "../pages/CustomerDashboardPage.js";
+import ProviderDashboardPage from "../pages/ProviderDashboardPage.js";
 
-const Home = {
+const HomePage = {
     template: `
         <div class="container mt-5">
             <h1>Welcome to Household Service App</h1>
@@ -15,23 +15,23 @@ const Home = {
 };
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login },
-    { path: '/register', component: CustomerRegister },
-    { path: '/provider-register', component: ProviderRegister },
+    { path: '/', component: HomePage },
+    { path: '/login', component: LoginPage },
+    { path: '/register', component: CustomerRegisterPage },
+    { path: '/provider-register', component: ProviderRegisterPage },
     { 
         path: '/admin-dashboard', 
-        component: AdminDashboard, 
+        component: AdminDashboardPage, 
         meta: { requiresAuth: true, role: 'admin' }
     },
     { 
         path: '/customer-dashboard', 
-        component: CustomerDashboard, 
+        component: CustomerDashboardPage, 
         meta: { requiresAuth: true, role: 'customer' }
     },
     { 
         path: '/provider-dashboard', 
-        component: ProviderDashboard, 
+        component: ProviderDashboardPage, 
         meta: { requiresAuth: true, role: 'provider' }
     }
 ];

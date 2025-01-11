@@ -1,6 +1,6 @@
-import Navbar from "./components/Navbar.js"
-import router from "./utils/router.js"
-import store from "./utils/store.js"
+import Navbar from "./components/Navbar.js";
+import router from "./utils/router.js";
+import store from "./utils/store.js";
 
 const app = new Vue({
     el: '#app',
@@ -15,4 +15,4 @@ const app = new Vue({
     },
     router,
     store,
-})
+});
