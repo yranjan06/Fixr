@@ -1,41 +1,42 @@
 const store = new Vuex.Store({
-    state : {
-        // like data
-        auth_token : null,
-        role : null,
-        loggedIn : false,
-        user_id : null,
+    state: {
+        authToken: null,
+        userEmail: null,
+        userRoles: [],
+        loggedIn: false,
+        userId: null
     },
-    mutations : {
-        // functions that change state
+    mutations: {
         setUser(state) {
-            try{
-             if (JSON.parse(localStorage.getItem('user'))){
-                const user = JSON.parse(localStorage.getItem('user'));
-                state.auth_token = user.token;
-                state.role = user.role;
-                state.loggedIn = true;
-                state.user_id = user.id;
-             }
-            } catch {
-                console.warn('not logged in')
-        }         
+            try {
+                const userData = JSON.parse(localStorage.getItem('user'));
+                if (userData) {
+                    state.authToken = userData.token;
+                    state.userEmail = userData.email;
+                    state.userRoles = userData.roles;
+                    state.loggedIn = true;
+                    state.userId = userData.id;
+                }
+            } catch (error) {
+                console.warn('Not logged in:', error);
+            }
         },
-
-        logout(state){
-            state.auth_token = null;
-            state.role = null;
+        logout(state) {
+            state.authToken = null;
+            state.userEmail = null;
+            state.userRoles = [];
             state.loggedIn = false;
-            state.user_id = null;
-
-            localStorage.removeItem('user')
+            state.userId = null;
+            localStorage.removeItem('user');
         }
     },
-    actions : {
-        // actions commit mutations can be async
+    getters: {
+        isAdmin: state => state.userRoles.includes('admin'),
+        isProvider: state => state.userRoles.includes('provider'),
+        isCustomer: state => state.userRoles.includes('customer')
     }
-})
+});
 
-store.commit('setUser')
+store.commit('setUser');
 
 export default store;
