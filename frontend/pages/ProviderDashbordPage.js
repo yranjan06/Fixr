@@ -1,7 +1,7 @@
-export default{
-    template : `
-        <div>
-            <h1> this is provider dashboard </h1>
+export default {
+    template: `
+        <div class="container mt-4">
+            <h1>Provider Dashboard</h1>
         </div>
     `
 }

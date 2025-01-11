@@ -1,8 +1,9 @@
-import LoginPage from "../pages/LoginPage.js";
-import CustomerRegisterPage from "../pages/CustomerRegisterPage.js";
-import AdminDashboardPage from "../pages/AdminDashboardPage.js";
-import CustomerDashboardPage from "../pages/CustomerDashboardPage.js";
-import ProviderDashboardPage from "../pages/ProviderDashboardPage.js";
+import Login from "../pages/Login.js";
+import CustomerRegister from "../pages/CustomerRegister.js";
+import ProviderRegister from "../pages/ProviderRegister.js";
+import AdminDashboard from "../pages/AdminDashboard.js";
+import CustomerDashboard from "../pages/CustomerDashboard.js";
+import ProviderDashboard from "../pages/ProviderDashboard.js";
 
 const Home = {
     template: `
@@ -15,21 +16,22 @@ const Home = {
 
 const routes = [
     { path: '/', component: Home },
-    { path: '/login', component: LoginPage },
-    { path: '/register', component: CustomerRegisterPage },
+    { path: '/login', component: Login },
+    { path: '/register', component: CustomerRegister },
+    { path: '/provider-register', component: ProviderRegister },
     { 
         path: '/admin-dashboard', 
-        component: AdminDashboardPage, 
+        component: AdminDashboard, 
         meta: { requiresAuth: true, role: 'admin' }
     },
     { 
         path: '/customer-dashboard', 
-        component: CustomerDashboardPage, 
+        component: CustomerDashboard, 
         meta: { requiresAuth: true, role: 'customer' }
     },
     { 
         path: '/provider-dashboard', 
-        component: ProviderDashboardPage, 
+        component: ProviderDashboard, 
         meta: { requiresAuth: true, role: 'provider' }
     }
 ];
@@ -39,6 +41,8 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+    const store = router.app.$store;
+    
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!store.state.loggedIn) {
             next('/login');
