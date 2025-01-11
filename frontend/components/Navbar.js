@@ -1,20 +1,19 @@
 export default {
     template: `
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div class="container-fluid">
-            <router-link class="navbar-brand" to="/">Fixr</router-link>
-            <div class="navbar-nav">
-                <template v-if="!$store.state.loggedIn">
-                    <router-link class="nav-link" to="/login">Login</router-link>
-                    <router-link class="nav-link" to="/register/customer">Register as Customer</router-link>
-                    <router-link class="nav-link" to="/register/professional">Register as Professional</router-link>
-                </template>
-                <template v-else>
-                    <span class="nav-link">Welcome, {{ $store.state.email }}</span>
-                    <a class="nav-link" href="#" @click="$store.commit('logout')">Logout</a>
-                </template>
-            </div>
-        </div>
-    </nav>
+    <div>
+        <router-link to='/'>Home</router-link>
+        
+        <!-- Links for non-logged-in users -->
+        <router-link v-if="!$store.state.loggedIn" to='/login'>Login</router-link>
+        <router-link v-if="!$store.state.loggedIn" to='/register'>Register</router-link>
+        
+        <!-- Links for logged-in users -->
+        <router-link v-if="$store.state.loggedIn && $store.state.role === 'customer'" to='/customer-home'>Customer Home</router-link>
+        <router-link v-if="$store.state.loggedIn && $store.state.role === 'professional'" to='/professional-home'>Professional Home</router-link>
+        <router-link v-if="$store.state.loggedIn && $store.state.role === 'admin'" to='/admin-home'>Admin Dashboard</router-link>
+        
+        <!-- Logout button for logged-in users -->
+        <button v-if="$store.state.loggedIn" @click="$store.commit('logout')">Logout</button>
+    </div>
     `
 }

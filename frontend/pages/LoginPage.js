@@ -1,45 +1,33 @@
 export default {
-    template: `
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title text-center mb-4">Login</h3>
-                    <div v-if="$store.state.error" class="alert alert-danger">
-                        {{ $store.state.error }}
-                    </div>
-                    <form @submit.prevent="submitLogin">
-                        <div class="mb-3">
-                            <input type="email" class="form-control" placeholder="Email" 
-                                v-model="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" placeholder="Password" 
-                                v-model="password" required minlength="6">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100" 
-                                :disabled="$store.state.loading">
-                            {{ $store.state.loading ? 'Loading...' : 'Login' }}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+    template : `
+    <div>
+        <input placeholder="email"  v-model="email"/>  
+        <input placeholder="password"  v-model="password"/>  
+        <button class='btn btn-primary' @click="submitLogin"> Login </button>
     </div>
     `,
-    data() {
+    data(){
         return {
-            email: '',
-            password: '',
-        }
+            email : null,
+            password : null,
+        } 
     },
-    methods: {
-        async submitLogin() {
-            if (await this.$store.dispatch('login', {
-                email: this.email,
-                password: this.password
-            })) {
-                this.$router.push('/');
+    methods : {
+        async submitLogin(){
+            const res = await fetch(location.origin+'/login', 
+                {
+                    method : 'POST', 
+                    headers: {'Content-Type' : 'application/json'}, 
+                    body : JSON.stringify({'email': this.email,'password': this.password})
+                })
+            if (res.ok){
+                console.log('we are logged in')
+                const data = await res.json()
+              
+                localStorage.setItem('user', JSON.stringify(data))
+                
+                this.$store.commit('setUser')
+                this.$router.push('/feed')
             }
         }
     }

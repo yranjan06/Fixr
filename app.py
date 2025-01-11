@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import login_required
-from backend.config import LocalDevelopmentConfig
-from backend.models import db, User, Role
+from backend.config import DevelopmentConfig
+from backend.models import db, User, Role, UserRoles, Service
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required
 from backend.resources import api
 
@@ -9,7 +9,7 @@ from backend.resources import api
 def createApp():
     app = Flask(__name__, template_folder='frontend', static_folder='frontend', static_url_path='/static')
 
-    app.config.from_object(LocalDevelopmentConfig)
+    app.config.from_object(DevelopmentConfig)
 
 
     # model init

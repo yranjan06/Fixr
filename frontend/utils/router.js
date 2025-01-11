@@ -1,21 +1,27 @@
-import HomePage from '../pages/HomePage.js'
-import LoginPage from '../pages/LoginPage.js'
-import CustomerRegisterPage from '../pages/CustomerRegisterPage.js'
-import ProfessionalRegisterPage from '../pages/ProfessionalRegisterPage.js'
+const Home = {
+    template : `<h1> this is home </h1>`
+}
+import AdminDashboardPage from "../pages/AdminDashboardPage.js";
+import BlogsListPage from "../pages/BlogsListPage.js";
+import DisplayBlogPage from "../pages/DisplayBlogPage.js";
+import LoginPage from "../pages/LoginPage.js";
+import RegisterPage from "../pages/RegisterPage.js";
+
+import store from './store.js'
+
 
 const routes = [
-    { path: '/', component: HomePage },
-    { path: '/login', component: LoginPage },
-    { path: '/register/customer', component: CustomerRegisterPage },
-    { path: '/register/professional', component: ProfessionalRegisterPage },
+    {path : '/', component : Home},
+    {path : '/login', component : LoginPage},
+    {path : '/register', component : RegisterPage},
+    {path : '/feed', component : BlogsListPage, meta : {requiresLogin : true}},
+    {path : '/blogs/:id', component : DisplayBlogPage, props : true, meta : {requiresLogin : true}},
+    {path : '/admin-dashboard', component : AdminDashboardPage, meta : {requiresLogin : true, role : "admin"}},
 ]
 
 const router = new VueRouter({
     routes
 })
-
-export default router
-
 
 // navigation guards
 router.beforeEach((to, from, next) => {
